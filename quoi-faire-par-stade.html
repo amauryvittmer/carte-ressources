@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vivre avec Alzheimer — votre parcours, étape par étape | Paroles d'Aidants</title>
+
+<!--
+  =====================================================================
+  MODE D'EMPLOI — à lire avant de remplir cette fiche
+  =====================================================================
+  Cette page est un GABARIT. Chaque carte grise pointillée est un
+  placeholder à remplacer par du contenu réel, sourcé sur France
+  Alzheimer (ou autre source officielle sérieuse).
+
+  STRUCTURE : une fois qu'un stade est choisi (onglets en haut), les
+  trois catégories d'aide (humaines / financières / juridiques)
+  s'affichent ENSEMBLE, côte à côte en colonnes, sans autre clic à
+  faire. Ne pas réintroduire de sous-navigation par catégorie : c'est
+  précisément ce que cette version corrige.
+
+  POUR AJOUTER / MODIFIER UNE CARTE :
+  Cherchez un bloc <article class="carte"> dans la colonne concernée
+  et copiez-le tel quel pour en dupliquer un nouveau. Chaque carte a
+  cette structure (mêmes champs que le format JSON des fiches du
+  forum, pour pouvoir migrer facilement plus tard) :
+
+    - .carte-souscat      → sous-type court (ex. "Démarche")
+    - .carte-titre        → la question, formulée comme un aidant la pose
+    - .carte-reponse      → la réponse courte, une phrase
+    - .carte-essentiel    → 2 à 4 points clés, en liste
+    - .carte-alerte       → optionnel, "à ne pas oublier" (supprimez le
+                             bloc entier si non utilisé)
+    - .carte-action       → bouton "En savoir plus", lien vers la
+                             ressource complète ou la démarche
+    - .carte-source       → nom de la source + date de mise à jour
+
+  POUR AJOUTER UNE NOUVELLE CATÉGORIE ou UN NOUVEAU STADE :
+  Dupliquez respectivement une <section class="colonne"> ou un
+  <div class="panneau-stade">, et pensez à mettre à jour l'onglet
+  correspondant dans <nav class="onglets">.
+
+  Couleurs et police reprennent la charte du forum Paroles d'Aidants
+  (bleu #3176B7, fond crème #F5F1E6) — voir variables CSS ci-dessous.
+  =====================================================================
+-->
+
+<style>
+  :root {
+    --cream: #F5F1E6;
+    --white: #FFFFFF;
+    --ink: #2C2C2C;
+    --ink-soft: #6B6558;
+    --blue: #3176B7;
+    --blue-soft: #E8F0F8;
+    --humaines: #5CB295;
+    --humaines-soft: #E7F4EF;
+    --financieres: #CEAA45;
+    --financieres-soft: #FBF3DF;
+    --juridiques: #E26D38;
+    --juridiques-soft: #FCEAE0;
+    --alerte: #E0603A;
+    --alerte-soft: #FBEAE4;
+    --line: #E4DECD;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--blue); }
+
+  .conteneur {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---------- EN-TÊTE ---------- */
+  header.hero {
+    padding: 56px 0 32px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hero-inner {
+    max-width: 920px;
+  }
+
+  .fil-retour {
+    display: inline-block;
+    font-size: 15px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    margin-bottom: 20px;
+  }
+  .fil-retour:hover { color: var(--blue); }
+
+  h1 {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0 0 14px;
+    max-width: 18ch;
+  }
+
+  .intro {
+    font-size: 18px;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0 0 20px;
+  }
+
+  .note-source {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    background: var(--blue-soft);
+    border-radius: 999px;
+    padding: 8px 16px;
+  }
+
+  /* ---------- ONGLETS DE STADE (segmented control) ---------- */
+  nav.onglets {
+    position: sticky;
+    top: 0;
+    background: var(--cream);
+    z-index: 10;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .onglets-liste {
+    display: flex;
+    gap: 4px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px;
+    max-width: 720px;
+    overflow-x: auto;
+  }
+
+  .onglet {
+    flex: 1 1 0;
+    min-width: 148px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+    padding: 11px 16px;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--ink);
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .onglet-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--cream);
+    color: var(--ink-soft);
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .onglet-titre {
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .onglet.actif { background: var(--blue); color: var(--white); }
+  .onglet.actif .onglet-num { background: rgba(255,255,255,0.22); color: var(--white); }
+
+  /* ---------- PANNEAUX DE STADE ---------- */
+  .panneau-stade { display: none; padding: 40px 0 24px; }
+  .panneau-stade.actif { display: block; animation: apparition 0.28s ease; }
+
+  @keyframes apparition {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .stade-description {
+    font-size: 16px;
+    color: var(--ink-soft);
+    max-width: 68ch;
+    margin: 0 0 32px;
+  }
+
+  /* ---------- GRILLE DES 3 COLONNES (tout visible en même temps) ---------- */
+  .grille-aides {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--line);
+  }
+
+  .colonne {
+    background: var(--cream);
+    padding: 22px 18px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .colonne-entete {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+
+  .colonne-icone {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .colonne-icone svg { width: 18px; height: 18px; }
+
+  .colonne-entete h2 {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .colonne.humaines .colonne-icone { background: var(--humaines-soft); color: #2f6b53; }
+  .colonne.financieres .colonne-icone { background: var(--financieres-soft); color: #8a6c1f; }
+  .colonne.juridiques .colonne-icone { background: var(--juridiques-soft); color: #a8461f; }
+
+  /* ---------- CARTE ---------- */
+  .carte {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-left: 3px solid transparent;
+    border-radius: 10px;
+    padding: 18px;
+  }
+
+  .colonne.humaines .carte { border-left-color: var(--humaines); }
+  .colonne.financieres .carte { border-left-color: var(--financieres); }
+  .colonne.juridiques .carte { border-left-color: var(--juridiques); }
+
+  .carte-souscat {
+    font-size: 12.5px;
+    font-weight: 700;
+    margin: 0 0 8px;
+  }
+  .colonne.humaines .carte-souscat { color: #2f6b53; }
+  .colonne.financieres .carte-souscat { color: #8a6c1f; }
+  .colonne.juridiques .carte-souscat { color: #a8461f; }
+
+  .carte-titre {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    line-height: 1.35;
+  }
+
+  .carte-reponse {
+    font-size: 14.5px;
+    color: var(--ink);
+    margin: 0 0 12px;
+  }
+
+  .carte-essentiel {
+    margin: 0 0 12px;
+    padding: 0;
+    list-style: none;
+  }
+  .carte-essentiel li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 5px;
+  }
+  .carte-essentiel li::before {
+    content: "•";
+    position: absolute;
+    left: 3px;
+    color: var(--ink-soft);
+  }
+
+  .carte-alerte {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    background: var(--alerte-soft);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13.5px;
+    color: #8a3a20;
+    margin-bottom: 14px;
+  }
+
+  .carte-pied {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .carte-action {
+    display: inline-block;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--white);
+    background: var(--blue);
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 999px;
+  }
+
+  .carte-source {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  /* Repère visuel "à remplacer" — à retirer quand le contenu est réel */
+  .carte.a-remplir {
+    border-style: dashed;
+    border-left-style: solid;
+    border-color: #C8C0A8;
+  }
+  .colonne.humaines .carte.a-remplir { border-left-color: var(--humaines); }
+  .colonne.financieres .carte.a-remplir { border-left-color: var(--financieres); }
+  .colonne.juridiques .carte.a-remplir { border-left-color: var(--juridiques); }
+  .carte.a-remplir .carte-titre::after {
+    content: " [exemple à remplacer]";
+    font-size: 11.5px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
+  footer.pied {
+    padding: 36px 0 60px;
+    border-top: 1px solid var(--line);
+    margin-top: 24px;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 900px) {
+    .grille-aides { grid-template-columns: 1fr; }
+    .colonne { border-bottom: 1px solid var(--line); }
+    .colonne:last-child { border-bottom: none; }
+  }
+
+  @media (max-width: 640px) {
+    h1 { font-size: 27px; }
+    .onglets-liste { max-width: none; }
+    .onglet-titre { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+
+<div class="conteneur">
+  <header class="hero">
+    <div class="hero-inner">
+      <a class="fil-retour" href="/">← Retour à l'accueil</a>
+      <h1>Vivre avec Alzheimer : votre parcours, étape par étape</h1>
+      <p class="intro">
+        Un proche vient d'être diagnostiqué, ou sa maladie évolue. À chaque étape
+        correspondent des aides différentes — humaines, financières et juridiques.
+        Choisissez ci-dessous où vous en êtes aujourd'hui : toutes les ressources
+        qui vous concernent apparaissent aussitôt, réunies sur cette page.
+      </p>
+      <span class="note-source">📖 Sources : France Alzheimer et organismes officiels</span>
+    </div>
+  </header>
+
+  <nav class="onglets">
+    <div class="onglets-liste">
+      <button class="onglet actif" data-stade="stade-1">
+        <span class="onglet-num">1</span>
+        <span class="onglet-titre">Les premiers pas</span>
+      </button>
+      <button class="onglet" data-stade="stade-2">
+        <span class="onglet-num">2</span>
+        <span class="onglet-titre">Un accompagnement plus présent</span>
+      </button>
+      <button class="onglet" data-stade="stade-3">
+        <span class="onglet-num">3</span>
+        <span class="onglet-titre">Une dépendance importante</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- STADE 1 — Les premiers pas                                    -->
+  <!-- ============================================================ -->
+  <div class="panneau-stade actif" id="stade-1">
+    <p class="stade-description">
+      Le diagnostic vient d'être posé, ou les premiers signes se confirment.
+      C'est le moment de comprendre la maladie, de s'organiser sans se
+      précipiter, et de savoir vers qui se tourner.
+    </p>
+
+    <div class="grille-aides">
+
+      <section class="colonne humaines">
+        <div class="colonne-entete">
+          <span class="colonne-icone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"></circle><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"></path></svg>
+          </span>
+          <h2>Aides humaines</h2>
+        </div>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">Accompagnement</p>
+          <h3 class="carte-titre">Qui peut m'expliquer ce diagnostic simplement ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+            <li>Troisième point clé si besoin</li>
+          </ul>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : France Alzheimer — à jour au JJ/MM/AAAA</span>
+          </div>
+        </article>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">Accompagnement</p>
+          <h3 class="carte-titre">Comment trouver un groupe de parole près de chez moi ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="colonne financieres">
+        <div class="colonne-entete">
+          <span class="colonne-icone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><text x="12" y="16.2" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor" stroke="none">€</text></svg>
+          </span>
+          <h2>Aides financières</h2>
+        </div>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">Démarche</p>
+          <h3 class="carte-titre">Quelle aide demander en premier ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-alerte">⚠️ <span>À ne pas oublier : phrase courte d'avertissement.</span></div>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">Démarche</p>
+          <h3 class="carte-titre">Ai-je droit à un crédit d'impôt ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="colonne juridiques">
+        <div class="colonne-entete">
+          <span class="colonne-icone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M6 8h12M4 8l2.5 5a2.5 2.5 0 0 0 5 0L9 8M14 8l2.5 5a2.5 2.5 0 0 0 5 0L19 8"></path><path d="M8 20h8"></path></svg>
+          </span>
+          <h2>Aides juridiques</h2>
+        </div>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">À anticiper</p>
+          <h3 class="carte-titre">Faut-il déjà penser à une protection juridique ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">À anticiper</p>
+          <h3 class="carte-titre">Qu'est-ce qu'une procuration bancaire, et pourquoi maintenant ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- STADE 2 — Un accompagnement plus présent                      -->
+  <!-- ============================================================ -->
+  <div class="panneau-stade" id="stade-2">
+    <p class="stade-description">
+      Le quotidien demande plus de présence. Il devient utile de s'entourer,
+      d'alléger la charge, et de sécuriser les démarches en cours.
+    </p>
+
+    <div class="grille-aides">
+
+      <section class="colonne humaines">
+        <div class="colonne-entete">
+          <span class="colonne-icone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"></circle><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"></path></svg>
+          </span>
+          <h2>Aides humaines</h2>
+        </div>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">Accompagnement</p>
+          <h3 class="carte-titre">Comment faire venir une aide à domicile ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">Répit</p>
+          <h3 class="carte-titre">Comment souffler quelques jours sans culpabiliser ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="colonne financieres">
+        <div class="colonne-entete">
+          <span class="colonne-icone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><text x="12" y="16.2" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor" stroke="none">€</text></svg>
+          </span>
+          <h2>Aides financières</h2>
+        </div>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">Démarche</p>
+          <h3 class="carte-titre">Qu'est-ce que l'APA à domicile, et comment la demander ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">Démarche</p>
+          <h3 class="carte-titre">Puis-je être rémunéré(e) en tant qu'aidant ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="colonne juridiques">
+        <div class="colonne-entete">
+          <span class="colonne-icone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M6 8h12M4 8l2.5 5a2.5 2.5 0 0 0 5 0L9 8M14 8l2.5 5a2.5 2.5 0 0 0 5 0L19 8"></path><path d="M8 20h8"></path></svg>
+          </span>
+          <h2>Aides juridiques</h2>
+        </div>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">Protection</p>
+          <h3 class="carte-titre">Habilitation familiale ou tutelle : quelle différence ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-alerte">⚠️ <span>À ne pas oublier : phrase courte d'avertissement.</span></div>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">Protection</p>
+          <h3 class="carte-titre">Que faire en cas de désaccord entre frères et sœurs ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- STADE 3 — Une dépendance importante                           -->
+  <!-- ============================================================ -->
+  <div class="panneau-stade" id="stade-3">
+    <p class="stade-description">
+      Le proche a besoin d'une présence quasi permanente. Les questions se
+      tournent vers l'organisation durable des soins, du budget et de la
+      protection légale.
+    </p>
+
+    <div class="grille-aides">
+
+      <section class="colonne humaines">
+        <div class="colonne-entete">
+          <span class="colonne-icone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"></circle><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"></path></svg>
+          </span>
+          <h2>Aides humaines</h2>
+        </div>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">Accompagnement</p>
+          <h3 class="carte-titre">Comment envisager un accueil de jour ou un EHPAD ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">Accompagnement</p>
+          <h3 class="carte-titre">Quels professionnels de santé impliquer au quotidien ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="colonne financieres">
+        <div class="colonne-entete">
+          <span class="colonne-icone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><text x="12" y="16.2" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor" stroke="none">€</text></svg>
+          </span>
+          <h2>Aides financières</h2>
+        </div>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">Démarche</p>
+          <h3 class="carte-titre">Comment financer le reste à charge en EHPAD ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">Démarche</p>
+          <h3 class="carte-titre">Ai-je droit à l'aide sociale à l'hébergement (ASH) ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="colonne juridiques">
+        <div class="colonne-entete">
+          <span class="colonne-icone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M6 8h12M4 8l2.5 5a2.5 2.5 0 0 0 5 0L9 8M14 8l2.5 5a2.5 2.5 0 0 0 5 0L19 8"></path><path d="M8 20h8"></path></svg>
+          </span>
+          <h2>Aides juridiques</h2>
+        </div>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">Protection</p>
+          <h3 class="carte-titre">Comment est gérée l'obligation alimentaire entre proches ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+
+        <article class="carte a-remplir">
+          <p class="carte-souscat">Protection</p>
+          <h3 class="carte-titre">Quels sont les droits de la personne protégée ?</h3>
+          <p class="carte-reponse">Réponse courte et directe en une phrase.</p>
+          <ul class="carte-essentiel">
+            <li>Premier point clé</li>
+            <li>Deuxième point clé</li>
+          </ul>
+          <div class="carte-pied">
+            <a class="carte-action" href="#">En savoir plus</a>
+            <span class="carte-source">Source : à compléter</span>
+          </div>
+        </article>
+      </section>
+
+    </div>
+  </div>
+
+  <footer class="pied">
+    Cette fiche est en cours de construction. Les informations affichées ici
+    sont des exemples de structure, pas encore des contenus validés.
+    Paroles d'Aidants — contenu vérifié auprès de sources officielles
+    (France Alzheimer notamment).
+  </footer>
+</div>
+
+<script>
+  const onglets = document.querySelectorAll('.onglet');
+  const panneaux = document.querySelectorAll('.panneau-stade');
+
+  onglets.forEach(onglet => {
+    onglet.addEventListener('click', () => {
+      const cible = onglet.dataset.stade;
+
+      onglets.forEach(o => o.classList.remove('actif'));
+      onglet.classList.add('actif');
+
+      panneaux.forEach(p => p.classList.toggle('actif', p.id === cible));
+    });
+  });
+</script>
+
+</body>
+</html>
