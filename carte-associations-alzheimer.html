@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
   /* ===========================================================
@@ -227,91 +228,55 @@
 /* =====================================================================
    DONNÉES DES RESSOURCES
    ---------------------------------------------------------------------
-   Pour ajouter une ressource : copiez un bloc { ... } et modifiez les
-   champs. Champs obligatoires : id, nom, type, ville, departement, lat, lng.
-   Champs optionnels : adresse, telephone, site, note.
+   Les données ne sont plus codées ici : elles viennent du fichier
+   "ressources.xlsx" (feuille "ressources"), qui doit se trouver dans le
+   même dossier que ce fichier html sur GitHub Pages.
 
+   Pour ajouter / modifier / supprimer une ressource : éditez ce fichier
+   Excel (voir sa feuille "instructions" pour le détail des colonnes),
+   enregistrez, puis git push. La carte relit le fichier à chaque
+   ouverture de la page — rien d'autre à faire.
+
+   Colonnes attendues : id, nom, type, ville, departement, adresse,
+   telephone, site, note, lat, lng.
    type : "antenne" (antenne départementale France Alzheimer),
           "association" (autre association liée à Alzheimer),
           "club" (club, café mémoire, groupe de parole autonome)
-
-   Pour trouver lat/lng d'une adresse : allez sur https://nominatim.openstreetmap.org
-   tapez l'adresse, et copiez les coordonnées du résultat. Les entrées
-   ci-dessous ont été géocodées au niveau de la ville (précision correcte
-   pour une carte de repérage) : affinez-les si vous avez l'adresse exacte
-   au moment de les ajouter.
-
-   Sources des entrées de démarrage : sites officiels francealzheimer.org,
-   pages locales des antennes (consultées le 07/09/2026). Cette liste est
-   un point de départ, pas un annuaire complet — les ~95 autres antennes
-   départementales restent à ajouter au fil du temps.
    ===================================================================== */
-const RESSOURCES = [
-  {
-    id: "siege-national",
-    nom: "Union nationale France Alzheimer et maladies apparentées",
-    type: "antenne",
-    ville: "Paris",
-    departement: "75 — Paris",
-    adresse: "21 boulevard Montmartre, 75002 Paris",
-    telephone: "0 800 97 20 97",
-    site: "https://www.francealzheimer.org",
-    note: "Siège national. Numéro d'écoute Allô France Alzheimer, gratuit.",
-    lat: 48.8712, lng: 2.3435
-  },
-  {
-    id: "isere",
-    nom: "France Alzheimer Isère",
-    type: "antenne",
-    ville: "Grenoble",
-    departement: "38 — Isère",
-    adresse: "34 avenue Marcelin Berthelot, 38100 Grenoble",
-    telephone: "04 76 43 18 19",
-    site: "https://www.francealzheimer.org/isere",
-    lat: 45.1885, lng: 5.7245
-  },
-  {
-    id: "val-de-marne",
-    nom: "France Alzheimer Val-de-Marne",
-    type: "antenne",
-    ville: "Nogent-sur-Marne",
-    departement: "94 — Val-de-Marne",
-    adresse: "4 rue du Maréchal Vaillant, 94130 Nogent-sur-Marne",
-    telephone: "01 48 72 87 82",
-    note: "Permanences d'accueil dans une dizaine de villes du département.",
-    lat: 48.8377, lng: 2.4830
-  },
-  {
-    id: "seine-saint-denis",
-    nom: "France Alzheimer Seine-Saint-Denis",
-    type: "antenne",
-    ville: "Le Raincy",
-    departement: "93 — Seine-Saint-Denis",
-    adresse: "91 avenue de la Résistance, 93340 Le Raincy",
-    lat: 48.8933, lng: 2.5150
-  },
-  {
-    id: "aisne",
-    nom: "France Alzheimer Aisne",
-    type: "antenne",
-    ville: "Soissons",
-    departement: "02 — Aisne",
-    adresse: "35 boulevard Jeanne d'Arc, immeuble Royaumont, 02200 Soissons",
-    site: "mailto:aisnealzheimer@gmail.com",
-    lat: 49.3793, lng: 3.3236
-  },
-  {
-    id: "seine-et-marne",
-    nom: "France Alzheimer Seine-et-Marne",
-    type: "antenne",
-    ville: "Saint-Fargeau-Ponthierry",
-    departement: "77 — Seine-et-Marne",
-    adresse: "77310 Saint-Fargeau-Ponthierry (siège)",
-    lat: 48.5450, lng: 2.6033
-  }
+const XLSX_PATH = "ressources.xlsx";
+const XLSX_SHEET = "ressources";
+let RESSOURCES = [];
 
-  // 👉 Nouvelle ressource : copiez un bloc ci-dessus, séparez par une virgule.
-];
+async function chargerRessources(){
+  const res = await fetch(XLSX_PATH, { cache: "no-store" });
+  if (!res.ok){
+    throw new Error(`Impossible de charger ${XLSX_PATH} (HTTP ${res.status})`);
+  }
+  const buf = await res.arrayBuffer();
+  const wb = XLSX.read(buf, { type: "array" });
+  const sheet = wb.Sheets[XLSX_SHEET];
+  if (!sheet){
+    throw new Error(`La feuille "${XLSX_SHEET}" est introuvable dans ${XLSX_PATH}`);
+  }
+  const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+  return rows
+    .filter(r => String(r.id || "").trim() !== "") // ignore les lignes vides
+    .map(r => ({
+      id: String(r.id).trim(),
+      nom: String(r.nom || "").trim(),
+      type: String(r.type || "").trim(),
+      ville: String(r.ville || "").trim(),
+      departement: String(r.departement || "").trim(),
+      adresse: String(r.adresse || "").trim(),
+      telephone: String(r.telephone || "").trim(),
+      site: String(r.site || "").trim(),
+      note: String(r.note || "").trim(),
+      lat: parseFloat(r.lat),
+      lng: parseFloat(r.lng)
+    }))
+    .filter(r => Number.isFinite(r.lat) && Number.isFinite(r.lng)); // ignore les lignes sans coordonnées valides
+}
 
 /* ===================== initialisation carte ===================== */
 const map = L.map('map', { scrollWheelZoom: true }).setView([46.6, 2.4], 6);
@@ -338,15 +303,19 @@ function makeIcon(color){
 
 const clusterGroup = L.markerClusterGroup({ maxClusterRadius: 45 });
 const markerById = {};
-
-RESSOURCES.forEach(r => {
-  const marker = L.marker([r.lat, r.lng], { icon: icons[r.type] });
-  marker.bindPopup(popupHtml(r));
-  marker.on('click', () => setActiveCard(r.id));
-  markerById[r.id] = marker;
-  clusterGroup.addLayer(marker);
-});
 map.addLayer(clusterGroup);
+
+function construireMarqueurs(){
+  clusterGroup.clearLayers();
+  for (const id in markerById) delete markerById[id];
+  RESSOURCES.forEach(r => {
+    const marker = L.marker([r.lat, r.lng], { icon: icons[r.type] || icons.club });
+    marker.bindPopup(popupHtml(r));
+    marker.on('click', () => setActiveCard(r.id));
+    markerById[r.id] = marker;
+    clusterGroup.addLayer(marker);
+  });
+}
 
 function popupHtml(r){
   return `<h3>${escapeHtml(r.nom)}</h3>
@@ -441,7 +410,23 @@ function escapeHtml(s){
 }
 function escapeAttr(s){ return escapeHtml(s); }
 
-render();
+/* ===================== démarrage : chargement du .xlsx ===================== */
+(async function demarrer(){
+  listEl.innerHTML = `<div class="empty">Chargement des ressources…</div>`;
+  try {
+    RESSOURCES = await chargerRessources();
+    construireMarqueurs();
+    render();
+  } catch (err) {
+    console.error(err);
+    listEl.innerHTML = `<div class="empty">
+      Impossible de charger le fichier <code>${escapeHtml(XLSX_PATH)}</code>.<br><br>
+      Vérifiez que ce fichier Excel se trouve bien dans le même dossier que cette page
+      sur GitHub, avec une feuille nommée exactement « ${escapeHtml(XLSX_SHEET)} ».<br><br>
+      Détail technique : ${escapeHtml(err.message || String(err))}
+    </div>`;
+  }
+})();
 </script>
 </body>
 </html>
